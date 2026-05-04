@@ -1,22 +1,38 @@
 import os
 import json
 import requests
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.common.action_chains import ActionChains
 from bs4 import BeautifulSoup
 
 product_code = input("Provide product code")
 page = 1
 next = True
 
-headers = (
+headers = {
     "Host" : "www.ceneo.pl",
     "Cookie": "",
     "User-Agent": "",
+}
 
-)
+url = f"https://www.ceneo.pl/{product_code}/opinie-{page}"
+
+path_to_driver = "D:\\chromedriver_win32\\chromedriver.exe"
+s = Service(path_to_driver)
+driver = webdriver.Chrome(service=s)
+driver.get(url)
+driver.maximize_window()
+driver.find_element(by="xpath",value="//*[@id='js_cookie-consent-general']/div/div[2]/button[1]").click()
+
+
+
 all_opinions = []
 while next: 
     url = f"https://www.ceneo.pl/{product_code}/opinie-{page}"
     print(url)
+
     response = requests.get(url,headers=headers)
     if response.status_code == 200:
         page_dom = BeautifulSoup(response.text, "html.parser")
